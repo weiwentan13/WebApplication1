@@ -1,0 +1,55 @@
+{
+  "countries": [
+    {
+      "country": "Malaysia",
+      "states": [
+        {
+          "name": "Johor",
+          "cities": [ "City M", "City N" ]
+        },
+        {
+          "name": "Kedah",
+          "cities": [ "City O" ]
+        },
+        {
+          "name": "Kelantan",
+          "cities": [ "City P", "City Q", "City R" ]
+        },
+        {
+          "name": "Kuala Lumpur",
+          "cities": [ "City S", "City T", "City U" ]
+        },
+        {
+          "name": "Malacca",
+          "cities": [ "City V", "City W", "City X", "City Y", "City Z" ]
+        }
+      ]
+    },
+    {
+      "country": "Macedonia",
+      "states": [
+        {
+          "name": "Aerodrom",
+          "cities": [ "City A", "City B", "City C" ]
+        },
+        {
+          "name": "Aracinovo",
+          "cities": [ "City D", "City E", "City F" ]
+        }
+      ]
+    },
+    {
+      "country": "Madagascar",
+      "states": [
+        {
+          "name": "Antananarivo",
+          "cities": [ "City G", "City H", "City I" ]
+        },
+        {
+          "name": "Antsiranana",
+          "cities": [ "City J", "City K", "City L" ]
+        }
+      ]
+    }
+  ]
+}

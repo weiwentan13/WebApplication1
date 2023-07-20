@@ -1,0 +1,182 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home Tab";
+}
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="text-center">
+    <div>
+        <h1>Home Page</h1>
+    </div>
+    <div class="container-xxl">
+        <div class="row">
+            <div class="col-2">
+                <div class="nav-side-menu">
+                    <div class="menu-list">
+                        <ul id="menu-content" class="menu-content collapse out"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-10 container-xl">
+                <div class="table-responsive">
+                    <div class="table-wrapper">
+                        <div class="table-title">
+                            <div class="row">
+                                <div class="col-sm-8"><h2>Customer <b>Details</b></h2></div>
+                            </div>
+                        </div>
+                        <table class="table table-striped table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name <i class="fa fa-sort"></i></th>
+                                    <th>Address</th>
+                                    <th>City <i class="fa fa-sort"></i></th>
+                                    <th>Pin Code</th>
+                                    <th>Country <i class="fa fa-sort"></i></th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers">
+                            </tbody>
+                        </table>
+                        <div class="clearfix">
+                            <div class="hint-text">Showing <b id="current"></b> out of <b id="total"></b> entries</div>
+                            <ul class="pagination">
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var countries = JSON.parse(@Html.Raw(@TempData["data"]));
+    var customers = JSON.parse(@Html.Raw(@TempData["data2"]));
+
+    const totalEntries = customers.customers.length;
+    var countrySelected = "";
+    var citySelected = "";
+    $("#total").html(totalEntries);
+
+    console.log(countries.countries);
+    console.log(customers.customers);
+    PopulateCountries();
+    PopulateCustomers("", "", 1);
+
+    function PageSelected(page){
+        console.log(page);
+        PopulateCustomers(countrySelected, citySelected, page);
+    }
+
+    function PopulateCustomers(country, city, page){
+        countrySelected = country;
+        citySelected = city;
+        var tablebody = $("#customers");
+        var pagination = $(".pagination");
+        var rowCount = 0;
+        var totalCustomerCount = 0;
+        var rowStart = (page - 1) * 5;
+        tablebody.empty();
+        pagination.empty();
+
+        $(customers.customers).each(function (index, value){
+            if(city != "" && value.city != city){
+                return;
+            }
+            if (country != "" && value.country != country) {
+                return;
+            }
+            totalCustomerCount += 1;
+            if (rowStart > 0) {
+                rowStart = rowStart - 1;
+                return;
+            }
+            
+            if (rowCount >= 5) {
+                return;
+            }
+            rowCount += 1;
+            var customer = $("<tr></tr>");
+            customer.append("<td>" + index + 1 + "</td>");
+            customer.append("<td>" + value.name + "</td>");
+            customer.append("<td>" + value.address + "</td>");
+            customer.append("<td>" + value.city + "</td>");
+            customer.append("<td>" + value.pinCode + "</td>");
+            customer.append("<td>" + value.country + "</td>");
+            var crudButton = "<td>";
+            crudButton += "<a href='#' class='view' title='View' data-toggle='tooltip'><i class='material-icons' data-customer='" + JSON.stringify(value) + "' onclick='CustomerDetails($(this).data())'>&#xE417;</i></a>";
+            crudButton += "<a href='#' class='edit' title='Edit' data-toggle='tooltip'><i class='material-icons'>&#xE254;</i></a>";
+            crudButton += "<a href='#' class='delete ' title='Delete' data-toggle='tooltip'><i class='material-icons'>&#xE872;</i></a>";
+            crudButton += "</td>";
+            customer.append(crudButton);
+
+            tablebody.append(customer);
+        })
+        $("#current").html(rowCount);
+        console.log("total customer count: " + totalCustomerCount);
+        pagination.append("<li class='page-item disabled'><a href='#'><i class='fa fa-angle-double-left'></i></a></li>")
+        for (let i = 0; i < totalCustomerCount; i+=5) {
+            if (i/5 == page - 1){
+                console.log("hit");
+                pagination.append("<li class='page-item active'><a class='page-link' onclick='PageSelected($(this).html())'>" + (i / 5 + 1) + "</a></li>");
+            }
+            else{
+                pagination.append("<li class='page-item'><a class='page-link' onclick='PageSelected($(this).html())'>" + (i / 5 + 1) + "</a></li>");
+            }
+        }
+        pagination.append("<li class='page-item'><a class='page-link'><i class='fa fa-angle-double-right'></i></a></li>")
+    }
+
+    function CityClicked(city){
+        console.log(city);
+        PopulateCustomers("", city, 1);
+    }
+
+    function CountryClicked(country) {
+        console.log(country);
+        PopulateCustomers(country, "", 1);
+    }
+
+    function CustomerDetails(data){
+        var customer = data.customer;
+        alert(customer.name + "\n" + customer.city + "\n" + customer.country + "\n" + customer.pinCode + "\n" +customer.address + "\n");
+    }
+
+    function PopulateCountries() {
+        var menu = $("#menu-content");
+        $(countries.countries).each(function (index, value) {
+            var country = $("<li></li>");
+            country.addClass("collapsed active");
+            country.attr('data-toggle', "collapse");
+            country.attr('data-target', "." + value.country);
+            country.html("<a onclick='CountryClicked($(this).html())'>" + value.country + "</a>");
+            menu.append(country);
+
+            var states = $("<ul></ul>");
+            states.addClass("sub-menu collapse");
+            states.addClass(value.country);
+            $(value.states).each(function (index, value) {
+                var state = $("<li></li>");
+                state.addClass("collapsed")
+                state.addClass("states");
+                state.attr('data-toggle', "collapse");
+                state.attr('data-target', "." + value.name);
+                state.html("<a>" + value.name + "</a>");
+                states.append(state);
+
+                var cities = $("<ul></ul>");
+                cities.addClass("sub-menu collapse");
+                cities.addClass(value.name);
+
+                $(value.cities).each(function (index, value) {
+                    cities.append("<li><a onclick='CityClicked($(this).html())'>" + value + "</a></li>");
+                })
+                states.append(cities);
+            })
+            menu.append(states);
+        })
+    }
+</script>
